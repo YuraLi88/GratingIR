@@ -25,8 +25,8 @@ module inData
     real(8)::Db=0.1d0,d=0.02d0,Ds1=4.d0, Ds !mkm (!)
     real(8),parameter::Zmin=-5.0, Zmax=5.0, v2D=1.1
 !2D gas parameters    
-    real(8)::t2D=4.0d0    
-    real(8)::n2D0=1.0d0,N2D
+    real(8)::t2D=0.0d0    
+    real(8)::n2D0=0.0d0,N2D
     real(8):: vdr0=0.0d7 ! cm/s
     real(8):: Edr=0.E2      ! V/cm
 !Grating parameters 
@@ -232,7 +232,9 @@ implicit none
 ! =============Body of MikhField======================================
     !
     !
-    !=================================================================    
+    !=================================================================
+
+    call uploadParamFromFile()    
     wds1=fill*period
     Vgup=Eg/hp_eV
     ALLOCATE(AllTrans(Npts,Npoints),Bjkl(N,neq,neq),Bjkl1(N,neq,neq))
@@ -381,7 +383,7 @@ implicit none
             v=v1+((k-1)*(v2-v1))/Npoints
             if (EpsInSb==1) then
                 EpsS=EpsSubstr(v*1.D12)
-                Eps2=EpsS
+                !Eps2=EpsS
             end if ! (EpsInSb==1)
             b10=sqrt(eps1/epsS)
             b3S0=sqrt(eps3/epsS)
@@ -718,12 +720,12 @@ implicit none
                                 end do !var i
                                 x=j/((Npx+1)*1.0)
                                 za=z/streep; AbsEx=Abs(Ex(j));    AbsEz=Abs(Ez(j))
-								
+                                
                                 if (time_anim==1) then
-									AbsE=Real(Ex(j)*exp(-c1*tPhaze))*Real(Ex(j)*exp(-c1*tPhaze))+Real(Ez(j)*exp(-c1*tPhaze))*Real(Ez(j)*exp(-c1*tPhaze))                                              
-									else
-									AbsE=AbsEx**2+AbsEz**2
-								endif !(time_anim=1)
+                                    AbsE=Real(Ex(j)*exp(-c1*tPhaze))*Real(Ex(j)*exp(-c1*tPhaze))+Real(Ez(j)*exp(-c1*tPhaze))*Real(Ez(j)*exp(-c1*tPhaze))                                              
+                                    else
+                                    AbsE=AbsEx**2+AbsEz**2
+                                endif !(time_anim=1)
                                 if (Z<0) then
                                     AbsE=Real(eps0)*AbsE
                                 endif
@@ -878,7 +880,7 @@ implicit none
         DEALLOCATE(R,R2m,Tr,TrMkh,TrUp2D,dU,P2Dm,LinSubstr,LinGrat)
         deallocate(Ex,Ez)    
         
-	call cpu_time(finish_time)
+    call cpu_time(finish_time)
         print *,'Calculation time=',finish_time-start_time
         !********************************************
     end do !!---End of external cykle----
@@ -899,6 +901,74 @@ implicit none
         15 format(1x <Npts+1>f15.9)
         18 format(1x 3f15.7,f15.10)
         19 format(1x <Npx+3>G25.9)
+
+    contains
+
+            subroutine uploadParamFromFile()
+
+                implicit none
+                integer::Nreads=12
+                character(25):: str
+                character(15):: name
+                integer::ios, divPos, counter
+                real(8):: param
+                open(1, file='params.txt',status='old')
+                do counter=1,Nreads
+                    read(1,*,iostat=ios) str
+                    divPos=index(str,':')
+                    if (divPos/=0) then
+                        name=str(:divPos-1)
+                        ! if (trim(AdjustL(name))=='Fname') then
+                        !         Fname=trim(AdjustL(str(divPos+1:)))
+                        !         print *,'Fname=',Fname
+                        ! endif
+                        read(str(divPos+1:),*) param
+                        select case(trim(AdjustL(name)))
+                            case('fill')
+                                fill=param
+                                print *,'fill=',fill
+                            case('Vmin')
+                                V1=param
+                                print *,'Vmin=',v1,' THz'
+                            case('Vmax')
+                                v2=param
+                                print *,'Vmax',v2,' THz' 
+                            case('period')
+                                period=param
+                                print *,'period=',period
+                            case('SigMetal')
+                                SigMetal=param
+                                print *,'SigMetal=',SigMetal
+                            case('Dgrat')
+                                Dgrat=param
+                                print *,'Dgrat=',Dgrat
+                            case('tgrat')
+                                tgrat=param
+                                print *,'tgrat=',tgrat
+                            case('EpsInSb_disp')
+                                EpsInSb=floor(param)
+                                print *,'EpsInSb=',EpsInSb
+                            case('eps2')
+                                eps2=param 
+                                print *,'eps2=',eps2
+                            case('d')
+                                d=param 
+                                print *,'d=',d
+                            case('epsS')
+                                epsS=param 
+                                print *,'epsS=',epsS
+                            case('Ds')
+                                Ds=param 
+                                print *,'Ds=',Ds
+                            case default
+                                print *,'ERROR: no that value ', name,'in default list'
+                        end select
+                    else
+                        print *, 'ERROR: no divider in string' 
+                    endif
+                end do
+                close(1)
+            end subroutine uploadParamFromFile
 end program MikhField
 
 complex(8) function SigDispMagn(G,tau1,v)
