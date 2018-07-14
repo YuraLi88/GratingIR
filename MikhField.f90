@@ -35,7 +35,7 @@ module inData
     real(8)::Sig1D=6.d17,dg=2.0d-6, n1D=0.0D10
 !FileName==================================        
     character(*),parameter::DirName='data\TSTmaping\' !'
-    character(*),parameter::FName='tstInverseVdr0'  
+    character(*),parameter::FName='test'  
     real(8)::tPhaze=0.3
     integer::Time,Tmax=1
     integer,parameter::Npx=700, Npz=700
@@ -211,7 +211,7 @@ implicit none
     complex(8),allocatable::Slk(:,:),Fn(:),Bm0(:),Matr(:,:),Bm(:,:),Bjkl(:,:,:),Bjkl1(:,:,:) 
     complex(8),allocatable::LUfac(:,:),wk(:),Det1(:,:)
     integer,allocatable::ipvt(:)
-    integer:: PhotorespCalc=1, DetOut=0, time_anim=0 
+    integer:: PhotorespCalc=0, DetOut=0, time_anim=0 
     external::BesU,mutau
     complex(8)::BettaGn
     !=========================
@@ -234,7 +234,7 @@ implicit none
     !
     !=================================================================
 
-    call uploadParamFromFile()    
+    !call uploadParamFromFile()    
     wds1=fill*period
     Vgup=Eg/hp_eV
     ALLOCATE(AllTrans(Npts,Npoints),Bjkl(N,neq,neq),Bjkl1(N,neq,neq))
