@@ -16,16 +16,16 @@ module inData
     implicit none
     integer(8),parameter::Np=500  !-discretization of profile (for arbitrary profile)
     real(8)::v1=0.1, v2=100.0       !-----------THz
-    integer(8)::Npoints=1000     !--discretization of frequency
+    integer(8),parameter::Npoints=1000     !--discretization of frequency
     real(8)::ZgratMin=0.2d0;
     real(8)::d_cut=0.01 ! mkm
     real(8)::n2Dup=0.0D12 !!!---2DEG above the grating (on the bkanket "substrate")
 !Substrate parameters    
-    complex(8)::eps0=1.D0,eps1=1.0D0,eps2=9.0D0,epsS=9.0D0,eps3=1.D0
-    real(8)::Db=0.1d0,d=0.01d0,Ds1=0.d1, Ds !mkm (!)
+    complex(8)::eps0=1.D0,eps1=1.0D0,eps2=9.0D0,epsS=1.0D0,eps3=1.D0
+    real(8)::Db=0.1d0,d=0.01d0,Ds1=0.1d0, Ds !mkm (!)
     real(8),parameter::Zmin=-5.0, Zmax=5.0, v2D=1.1
 !2D gas parameters    
-    real(8)::t2D=0.0d0    
+    real(8)::t2D=1.0d-5    
     real(8)::n2D0=0.0d0,N2D
     real(8):: vdr0=0.0d7 ! cm/s
     real(8):: Edr=0.E2      ! V/cm
@@ -135,7 +135,7 @@ module numcalc
     complex(8),allocatable::A(:,:)   !matrix of main equation
     complex(8),allocatable::Cn(:)    !Coef. of field on streep, solution of Matrix Equation
     integer,parameter::N=100        !Number of fourier garmonic in sum
-    integer,parameter::Neq=5     !Number of Equations
+    integer,parameter::Neq=7      !Number of Equations
     integer::j,k,l
     integer::ndata
     real(8)::tau2D,invtau=0.0,Mu,Vdr,tau
@@ -289,7 +289,6 @@ implicit none
               
         end if ! (realtau==1)
         Vdr=0.0 !7.5E-2 
-        tau2D=10.17
         invtau=1.d12/tau2D
         print *,'invtau=',invtau
         print *,'mu=',mu
@@ -407,12 +406,11 @@ implicit none
             expr1=(ksi0+b20+theta0)*exp(-c1*f20)
             expr2=(ksi0-b20+theta0)*exp(c1*f20)
             Rm0=(expr1+expr2)/(expr1-expr2)
-            W0=2/(alpha0(v)+b120*Rm0)
+            W0=2.d0/(alpha0(v)+b120*Rm0)
             psi00=psi0(v)
             Q0=b3S0*cos(f10)-c1*sin(f10)
             P0=cos(f10)-c1*b3S0*sin(f10)
             t0=b20/(b20*P0*cos(f20)-c1*(Q0+ksi0*P0)*sin(f20))  !exp(-c1*f20)
-            !!!!!!!!!!!!!!!!!!!!!!!!t2=abs(t0*W0)*abs(t0*W0)
             do i=-N,N
                     i1=i+N+1
                     gama2=gama02/((1-i*Vdr/(v*streep))*(invtau-2*pi*c1*v*1.d12*(1-i*Vdr/(v*streep))))
@@ -815,7 +813,6 @@ implicit none
         ! OPEN(1,file=Dirname//LFName//Fname//'TOT.dat')
         ! write(1,'(2(1x f15.7))'), LinGrat
         ! CLOSE(1)
-        
         OPEN(1,file=Dirname//LFName//Fname//'.dat') !    OPEN(1,file=Dirname//LFName//namV//Pref//Fname)
             do k=1,Npoints
                 !write(1,*),(v1+((k-1)*(v2-v1))/Npoints)/Vgup,1-TrMkh(k)-R(k) !normalised on Eg
