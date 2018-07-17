@@ -15,14 +15,14 @@
 module inData
     implicit none
     integer(8),parameter::Np=500  !-discretization of profile (for arbitrary profile)
-    real(8)::v1=0.1, v2=2.5       !-----------THz
+    real(8)::v1=0.1, v2=100.0       !-----------THz
     integer(8)::Npoints=1000     !--discretization of frequency
     real(8)::ZgratMin=0.2d0;
     real(8)::d_cut=0.01 ! mkm
     real(8)::n2Dup=0.0D12 !!!---2DEG above the grating (on the bkanket "substrate")
 !Substrate parameters    
-    complex(8)::eps0=1.D0,eps1=1.0D0,eps2=1.0D0,epsS=1.0D0,eps3=1.D0
-    real(8)::Db=0.1d0,d=0.02d0,Ds1=4.d0, Ds !mkm (!)
+    complex(8)::eps0=1.D0,eps1=1.0D0,eps2=9.0D0,epsS=9.0D0,eps3=1.D0
+    real(8)::Db=0.1d0,d=0.01d0,Ds1=0.d1, Ds !mkm (!)
     real(8),parameter::Zmin=-5.0, Zmax=5.0, v2D=1.1
 !2D gas parameters    
     real(8)::t2D=0.0d0    
@@ -30,12 +30,12 @@ module inData
     real(8):: vdr0=0.0d7 ! cm/s
     real(8):: Edr=0.E2      ! V/cm
 !Grating parameters 
-    real(8)::tgrat,SigMetal=4.D17, Dgrat=4.D-6
-    real(8)::fill=0.8d0, period=0.1, wds
+    real(8)::tgrat=0.1D0,SigMetal=3.D16, Dgrat=6.D-6
+    real(8)::fill=0.4d0, period=1.0, wds
     real(8)::Sig1D=6.d17,dg=2.0d-6, n1D=0.0D10
 !FileName==================================        
     character(*),parameter::DirName='data\TSTmaping\' !'
-    character(*),parameter::FName='test'  
+    character(*),parameter::FName='test2'  
     real(8)::tPhaze=0.3
     integer::Time,Tmax=1
     integer,parameter::Npx=700, Npz=700
@@ -44,7 +44,7 @@ module inData
     integer::NewSigmaCheb=1,realtau=0, wiresgrat=0
     integer::orto=0, Tau2D_Inf=0, BuildField=0
     integer::inverse_geom=0, LossInSubstrCalc=0
-    integer::epsInSb=0
+    integer::epsInSb=1
     complex(8)::free_part
     !=====================
 end module inData
@@ -383,6 +383,7 @@ implicit none
             v=v1+((k-1)*(v2-v1))/Npoints
             if (EpsInSb==1) then
                 EpsS=EpsSubstr(v*1.D12)
+                print *,Real(EpsS),AImag(EpsS)
                 !Eps2=EpsS
             end if ! (EpsInSb==1)
             b10=sqrt(eps1/epsS)
