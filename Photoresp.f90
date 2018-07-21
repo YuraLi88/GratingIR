@@ -3,9 +3,9 @@ module Photoresp
 use Allconst
 use msimsl
     implicit none
-    real(8),parameter::Eg=0.17 !eV
-    real(8),parameter::eps_const=15.7
-    real(8),parameter::constA=4.6E0
+    real(8),parameter::Eg=0.202 !eV
+    real(8),parameter::eps_const=16.0
+    real(8),parameter::constA=2.6E0
     real(8),parameter::J2erg=1.0E7
     real(8)::Vgup
 contains    
